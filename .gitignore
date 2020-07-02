@@ -4,5 +4,4 @@
 *.log
 
 .jest
-dist/
 node_modules/

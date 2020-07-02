@@ -1,0 +1,1 @@
+{"version":3,"file":"NestedError.js","sourceRoot":"","sources":["../src/NestedError.ts"],"names":[],"mappings":";;AAAA,MAAa,WAA6B,SAAQ,KAAK;IAGrD,YAAY,KAAQ,EAAE,OAAgB;QACpC,KAAK,CAAC,OAAO,IAAI,KAAK,CAAC,OAAO,CAAC,CAAC;QAChC,IAAI,CAAC,WAAW,GAAG,KAAK,CAAC;IAC3B,CAAC;CACF;AAPD,kCAOC"}
