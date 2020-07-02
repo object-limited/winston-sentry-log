@@ -20,8 +20,8 @@ export default class Sentry extends TransportStream {
   constructor(
     opts: {
       config: sentry.NodeOptions & {
-        tags: any;
-        extra: any;
+        tags?: any;
+        extra?: any;
       };
       [key: string]: any;
     } & TransportStreamOptions,
