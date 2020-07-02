@@ -103,7 +103,7 @@ class Sentry extends TransportStream {
                 else if (lodash_1.default.isError(info.error)) {
                     err = new NestedError_1.NestedError(info.error, message);
                 }
-                else if (lodash_1.default.isError(info.meta?.error)) {
+                else if (info.meta && lodash_1.default.isError(info.meta.error)) {
                     err = new NestedError_1.NestedError(info.meta.error, message);
                 }
                 else {

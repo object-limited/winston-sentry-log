@@ -127,7 +127,7 @@ export default class Sentry extends TransportStream {
           err = new NestedError(info, message);
         } else if (_.isError(info.error)) {
           err = new NestedError(info.error, message);
-        } else if (_.isError(info.meta?.error)) {
+        } else if (info.meta && _.isError(info.meta.error)) {
           err = new NestedError(info.meta.error, message);
         } else {
           err = new Error(message);
