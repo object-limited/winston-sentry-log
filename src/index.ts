@@ -121,7 +121,7 @@ export default class Sentry extends TransportStream {
       if (!!user) {
         scope.setUser(user);
       }
-      if (context.level === 'warning' || context.level === 'error' || context.level === 'fatal') {
+      if (context.level === 'error' || context.level === 'fatal') {
         let err: Error | null;
         if (_.isError(info) === true) {
           err = new NestedError(info, message);
@@ -137,8 +137,9 @@ export default class Sentry extends TransportStream {
         }
         this.sentryClient.captureException(err);
         return callback(null, true);
+      } else if (context.level === 'warning') {
+        this.sentryClient.captureMessage(message, context.level);
       }
-      this.sentryClient.captureMessage(message, context.level);
       return callback(null, true);
     });
   }
