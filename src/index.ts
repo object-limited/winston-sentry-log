@@ -2,6 +2,7 @@ import sentry from '@sentry/node';
 import _ from 'lodash';
 import TransportStream = require('winston-transport');
 
+import { TransportStreamOptions } from 'winston-transport';
 import { Context } from './types';
 
 const errorHandler = (err: any) => {
@@ -15,7 +16,15 @@ export default class Sentry extends TransportStream {
   protected sentryClient: typeof sentry;
   protected levelsMap: any;
 
-  constructor(opts: any) {
+  constructor(
+    opts: {
+      config: sentry.NodeOptions & {
+        tags: any;
+        extra: any;
+      };
+      [key: string]: any;
+    } & TransportStreamOptions,
+  ) {
     super(opts);
     this.name = 'winston-sentry-log';
     this.tags = {};
@@ -58,13 +67,15 @@ export default class Sentry extends TransportStream {
 
     this.sentryClient = options.sentryClient || require('@sentry/node');
     if (!!this.sentryClient) {
-      this.sentryClient.init(options.config || {
-        dsn: process.env.SENTRY_DSN || '',
-      });
+      this.sentryClient.init(
+        options.config || {
+          dsn: process.env.SENTRY_DSN || '',
+        },
+      );
 
       this.sentryClient.configureScope((scope: any) => {
         if (!_.isEmpty(this.tags)) {
-          Object.keys(this.tags).forEach((key) => {
+          Object.keys(this.tags).forEach(key => {
             scope.setTag(key, this.tags[key]);
           });
         }
@@ -74,7 +85,9 @@ export default class Sentry extends TransportStream {
 
   public log(info: any, callback: any) {
     const { message, fingerprint } = info;
-    const level = Object.keys(this.levelsMap).find(key => info.level.toString().includes(key));
+    const level = Object.keys(this.levelsMap).find(key =>
+      info.level.toString().includes(key),
+    );
     if (!level) {
       return callback(null, true);
     }
@@ -95,12 +108,12 @@ export default class Sentry extends TransportStream {
     this.sentryClient.configureScope((scope: sentry.Scope) => {
       const user = _.get(meta, 'user');
       if (_.has(context, 'extra')) {
-        Object.keys(context.extra).forEach((key) => {
+        Object.keys(context.extra).forEach(key => {
           scope.setExtra(key, context.extra[key]);
         });
       }
       if (!_.isEmpty(this.tags)) {
-        Object.keys(this.tags).forEach((key) => {
+        Object.keys(this.tags).forEach(key => {
           scope.setTag(key, this.tags[key]);
         });
       }
@@ -108,9 +121,13 @@ export default class Sentry extends TransportStream {
         scope.setUser(user);
       }
       if (context.level === 'error' || context.level === 'fatal') {
-        let err = null;
+        let err: Error | null;
         if (_.isError(info) === true) {
           err = info;
+        } else if (_.isError(info.error)) {
+          err = info.error;
+        } else if (_.isError(info.meta?.error)) {
+          err = info.meta.error;
         } else {
           err = new Error(message);
           if (info.stack) {
