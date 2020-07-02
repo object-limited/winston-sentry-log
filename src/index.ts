@@ -4,6 +4,7 @@ import TransportStream = require('winston-transport');
 
 import { TransportStreamOptions } from 'winston-transport';
 import { Context } from './types';
+import { NestedError } from "./NestedError";
 
 const errorHandler = (err: any) => {
   // tslint:disable-next-line
@@ -120,14 +121,14 @@ export default class Sentry extends TransportStream {
       if (!!user) {
         scope.setUser(user);
       }
-      if (context.level === 'error' || context.level === 'fatal') {
+      if (context.level === 'warning' || context.level === 'error' || context.level === 'fatal') {
         let err: Error | null;
         if (_.isError(info) === true) {
-          err = info;
+          err = new NestedError(info, message);
         } else if (_.isError(info.error)) {
-          err = info.error;
+          err = new NestedError(info.error, message);
         } else if (_.isError(info.meta?.error)) {
-          err = info.meta.error;
+          err = new NestedError(info.meta.error, message);
         } else {
           err = new Error(message);
           if (info.stack) {
